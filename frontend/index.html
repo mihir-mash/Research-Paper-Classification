@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Research Paper Classifier</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Research Paper Classifier</h1>
+    </header>
+    <main>
+        <h2>Upload your paper</h2>
+        <p>Classify research papers and get publishing recommendations.</p>
+        <form id="uploadForm">
+            <label class="upload-btn">
+                Select PDF File
+                <input type="file" name="file" id="pdfFile" accept=".pdf">
+            </label>
+            <button type="submit">Upload</button>
+        </form>
+        <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+    </main>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        const resultDiv = document.getElementById("result");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById("pdfFile");
+            const file = fileInput.files[0];
+            if (!file) {
+                resultDiv.innerText = "Please select a PDF file.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            resultDiv.innerText = "Analyzing...";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/upload_pdf", {
+                    method: "POST",
+                    body: formData,
+                });
+                console.log("Response Status:", response.status);
+
+                if (!response.ok) {
+                    throw new Error("Backend returned error status: " + response.status);
+                }
+
+                const data = await response.json();
+                console.log("Parsed Response:", data);
+
+                if (data.publishable) {
+                    resultDiv.innerHTML = `
+                         <strong>Result:</strong> Publishable<br>
+                         <strong>Recommended Conference:</strong> ${data.conference}<br>
+                         <strong>Rationale:</strong> ${data.rationale}
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                         <strong>Result:</strong> Not Publishable<br>
+                         <strong>Reason:</strong> ${data.rationale}
+                    `;
+                }
+            } catch (err) {
+                resultDiv.innerText = "❗ Error contacting backend or uploading file: " + err.message;
+            }
+        });
+    </script>
+</body>
+</html>
