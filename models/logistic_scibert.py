@@ -24,8 +24,8 @@ def get_loaded_model(path="models/scibert_small_classifier.pkl"):
 warnings.filterwarnings('ignore')
 
 # Paths
-LABELS_CSV = "reference_labels.csv"
-TEXTS_DIR = "cleaned_texts"
+LABELS_CSV = "../reference_labels.csv"
+TEXTS_DIR = "../cleaned_texts"
 MODELS_DIR = "."
 
 def load_data():

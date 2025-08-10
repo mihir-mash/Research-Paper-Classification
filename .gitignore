@@ -1,12 +1,41 @@
+# Python cache
 __pycache__/
-*.pyc
-.env
-*.log
-*.sqlite3
-*.db
-node_modules/
-dist/
-build/
-.vscode/
-.DS_Store
+*.py[cod]
+*$py.class
+
+# Virtual environment
 venv/
+.env
+
+# VS Code settings
+.vscode/
+
+# Jupyter checkpoints (if any)
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+temp.*
+
+# Model files and large binaries
+*.pkl
+*.npz
+*.h5
+*.pt
+*.onnx
+
+# Dataset and parsed/generated text
+drive dataset/
+parsed_texts/
+cleaned_texts/
+
+# PDF and other large documents
+*.pdf
+
+# Cache files
+*.cache

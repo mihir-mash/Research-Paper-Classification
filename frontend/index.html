@@ -2,72 +2,182 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Research Paper Classifier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchFit</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Research Paper Classifier</h1>
+        <img src="FullLogo_Transparent.png" alt="ResearchFit Logo" id="logo">
+        <h1>ResearchFit</h1>
     </header>
+
     <main>
-        <h2>Upload your paper</h2>
-        <p>Classify research papers and get publishing recommendations.</p>
-        <form id="uploadForm">
-            <label class="upload-btn">
-                Select PDF File
-                <input type="file" name="file" id="pdfFile" accept=".pdf">
-            </label>
-            <button type="submit">Upload</button>
-        </form>
-        <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+        <div id="uploadSection">
+            <h2>Upload Your Research Paper</h2>
+            <p>Check if your paper is publishable, get a conference recommendation, and see a breakdown of its classification.</p>
+            <form id="uploadForm">
+                <label for="pdfFile" class="upload-btn">
+                    Select PDF File
+                </label>
+                <input type="file" name="file" id="pdfFile" accept=".pdf" required>
+                <button type="submit">Analyze Paper</button>
+            </form>
+            <p id="fileName" class="file-name"></p>
+        </div>
+
+        <div id="featuresSection">
+            <div class="feature-card">
+                <h3><i class="fa-solid fa-lightbulb"></i> Publishability Check</h3>
+                <p>Our model analyzes your paper's structure and content to predict its likelihood of being published.</p>
+            </div>
+            <div class="feature-card">
+                <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Conference Matching</h3>
+                <p>Receive a recommendation for the most suitable conference based on your paper's topic and scope.</p>
+            </div>
+            <div class="feature-card">
+                <h3><i class="fa-solid fa-comment-dots"></i> Detailed Rationale</h3>
+                <p>Get a clear explanation for the recommendations, helping you understand your paper's strengths.</p>
+            </div>
+        </div>
+
+        <div id="loadingSection" class="hidden">
+            <div class="loader"></div>
+            <p>Analyzing your paper... this may take a moment.</p>
+        </div>
+
+        <div id="resultSection" class="hidden">
+
+        </div>
     </main>
 
-    <script>
-        const form = document.getElementById("uploadForm");
-        const resultDiv = document.getElementById("result");
+    <footer>
+        <p>Connect with me</p>
+        <div class="social-links">
+            <a href="mailto:mihirmashruwala@gmail.com" target="_blank" aria-label="Email" title="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://www.linkedin.com/in/mihir-mashruwala/" target="_blank" aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/mihir-mash" target="_blank" aria-label="GitHub" title="GitHub"><i class="fab fa-github"></i></a>
+        </div>
+    </footer>
 
-        form.addEventListener("submit", async (e) => {
+    <script>
+        const uploadForm = document.getElementById("uploadForm");
+        const pdfFile = document.getElementById("pdfFile");
+        const fileNameDisplay = document.getElementById("fileName");
+        const uploadSection = document.getElementById("uploadSection");
+        const featuresSection = document.getElementById("featuresSection"); 
+        const loadingSection = document.getElementById("loadingSection");
+        const resultSection = document.getElementById("resultSection");
+
+        pdfFile.addEventListener("change", () => {
+            if (pdfFile.files.length > 0) {
+                fileNameDisplay.textContent = `File selected: ${pdfFile.files[0].name}`;
+            } else {
+                fileNameDisplay.textContent = "";
+            }
+        });
+
+        uploadForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const fileInput = document.getElementById("pdfFile");
-            const file = fileInput.files[0];
+            const file = pdfFile.files[0];
             if (!file) {
-                resultDiv.innerText = "Please select a PDF file.";
+                alert("Please select a PDF file first.");
                 return;
             }
 
             const formData = new FormData();
             formData.append("file", file);
 
-            resultDiv.innerText = "Analyzing...";
+            // Hide upload and features sections, and show loader
+            uploadSection.classList.add("hidden");
+            featuresSection.classList.add("hidden"); // Hide features section
+            loadingSection.classList.remove("hidden");
+            resultSection.classList.add("hidden");
 
             try {
-                const response = await fetch("http://127.0.0.1:8000/upload_pdf", {
+                const response = await fetch("http://127.0.0.1:8000/upload_pdf_full", {
                     method: "POST",
                     body: formData,
                 });
-                console.log("Response Status:", response.status);
 
                 if (!response.ok) {
-                    throw new Error("Backend returned error status: " + response.status);
+                    const errorData = await response.json().catch(() => ({ detail: "Could not parse error response." }));
+                    const errorMessage = errorData.detail || `Backend error: ${response.status} ${response.statusText}`;
+                    throw new Error(errorMessage);
                 }
-
+                
                 const data = await response.json();
-                console.log("Parsed Response:", data);
 
+                // Hide loader
+                loadingSection.classList.add("hidden");
+                
+                let resultHTML = '';
                 if (data.publishable) {
-                    resultDiv.innerHTML = `
-                         <strong>Result:</strong> Publishable<br>
-                         <strong>Recommended Conference:</strong> ${data.conference}<br>
-                         <strong>Rationale:</strong> ${data.rationale}
+                    resultHTML = `
+                        <div class="result-card publishable">
+                            <h2>Result: <span class="highlight-publishable">Publishable</span></h2>
+                            <div class="result-item">
+                                <h3>Recommended Conference</h3>
+                                <p>${data.conference}</p>
+                            </div>
+                            <div class="result-item">
+                                <h3>Rationale</h3>
+                                <p>${data.rationale}</p>
+                            </div>
+                        </div>
                     `;
+                    
+                    if (data.percentages && Object.keys(data.percentages).length > 0) {
+                        resultHTML += `
+                        <div class="result-card percentages">
+                            <h3>Conference Fit Analysis</h3>
+                        `;
+                        // Sort percentages from highest to lowest before displaying
+                        const sortedPercentages = Object.entries(data.percentages).sort(([,a],[,b]) => b - a);
+
+                        for (const [conf, score] of sortedPercentages) {
+                            resultHTML += `
+                                <div class="percentage-item">
+                                    <span class="conf-name">${conf}</span>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar" style="width: ${score}%;"></div>
+                                    </div>
+                                    <span class="conf-score">${score.toFixed(1)}%</span>
+                                </div>
+                            `;
+                        }
+                        resultHTML += `</div>`;
+                    }
                 } else {
-                    resultDiv.innerHTML = `
-                         <strong>Result:</strong> Not Publishable<br>
-                         <strong>Reason:</strong> ${data.rationale}
+                    resultHTML = `
+                        <div class="result-card not-publishable">
+                            <h2>Result: <span class="highlight-not-publishable">Not Publishable</span></h2>
+                        </div>
+                        <div class="improvement-suggestion">
+                            <p><strong>Next Steps:</strong> You might need to work on the paper. Every great paper goes through many revisions!</p>
+                        </div>
                     `;
                 }
+                resultHTML += `<button onclick="window.location.reload()" class="reset-btn">Analyze Another Paper</button>`;
+                resultSection.innerHTML = resultHTML;
+                resultSection.classList.remove("hidden");
+
             } catch (err) {
-                resultDiv.innerText = "❗ Error contacting backend or uploading file: " + err.message;
+                // Hide loader and show error
+                loadingSection.classList.add("hidden");
+                resultSection.innerHTML = `
+                    <div class="result-card error">
+                        <h2>❗ Error</h2>
+                        <p>Could not process the file. Please try again later.</p>
+                        <p class="error-message"><strong>Details:</strong> ${err.message}</p>
+                        <button onclick="window.location.reload()" class="reset-btn">Try Again</button>
+                    </div>
+                `;
+                resultSection.classList.remove("hidden");
             }
         });
     </script>

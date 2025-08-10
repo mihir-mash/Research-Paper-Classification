@@ -7,12 +7,20 @@ import os
 _model_data = None
 
 def get_model(path=None):
-    global _model_data
-    if _model_data is None:
+    base = os.path.dirname(__file__)           # backend/
+    project_root = os.path.normpath(os.path.join(base, ".."))
+    if path is None:
+        candidates = [
+            os.path.join(project_root, "models", "scibert_small_classifier.pkl")
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                path = c
+                break
         if path is None:
-            path = os.path.join("models", "scibert_small_classifier.pkl")
-        _model_data = joblib.load(path)
-    return _model_data
+            raise FileNotFoundError("Could not find classifier pickle. Searched: " + ", ".join(candidates))
+    print("Loading model from", path)   
+    return joblib.load(path)
 
 def embed_text(text, model_name="allenai/scibert_scivocab_uncased", max_length=512):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -32,5 +40,6 @@ def predict_publishability(text):
     emb = embed_text(text, model_data['model_name'], model_data['max_length'])
     scaled = scaler.transform(emb)
     pred = clf.predict(scaled)[0]
+    print("DEBUG: Model raw prediction:", pred)  # <-- Add this line
     prob = clf.predict_proba(scaled)[0]
-    return "publishable" if pred == 1 else "non-publishable", float(max(prob))
+    return "publishable" if pred.lower().startswith("publish") else "non-publishable", float(max(prob))
