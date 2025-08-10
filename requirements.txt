@@ -1,0 +1,19 @@
+# Web Framework
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+
+# Machine Learning & Data
+scikit-learn
+joblib
+numpy
+scipy
+
+# PDF & Text Processing
+PyMuPDF
+transformers
+torch
+
+# API Calls (for rationale generation)
+groq
