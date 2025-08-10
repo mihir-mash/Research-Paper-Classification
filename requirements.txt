@@ -3,7 +3,6 @@ fastapi
 uvicorn[standard]
 pydantic
 python-multipart
-fastapi.middleware.cors  # (comes with fastapi, no need separate)
 
 # Machine Learning & Data
 scikit-learn
@@ -21,8 +20,3 @@ torch
 # API Calls (for rationale generation)
 groq
 python-dotenv  # for dotenv usage (load_dotenv)
-
-# Other
-warnings  # built-in, no need to add
-re  # built-in, no need to add
-os  # built-in, no need to add
