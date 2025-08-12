@@ -103,7 +103,7 @@ Open `frontend/index.html` in your browser (use Live Server or similar for best 
 1. **Upload a PDF** via the frontend.
 2. **Wait for analysis** (embedding and inference may take time).
 3. **View results**: Publishability, recommended conference, and rationale.
-
+[Demo Video](Implementation_Video.mp4)
 ---
 
 ## 🧩 Notes
@@ -111,6 +111,7 @@ Open `frontend/index.html` in your browser (use Live Server or similar for best 
 - If you add new labeled data, retrain the models.
 - For faster backend startup, embeddings are cached in `reference_embeddings.npz`.
 - Make sure all file paths in scripts match your folder structure.
+
 
 ---
 
