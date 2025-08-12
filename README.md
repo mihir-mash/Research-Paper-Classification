@@ -103,7 +103,7 @@ Open `frontend/index.html` in your browser (use Live Server or similar for best 
 1. **Upload a PDF** via the frontend.
 2. **Wait for analysis** (embedding and inference may take time).
 3. **View results**: Publishability, recommended conference, and rationale.
-![Demo Video](Implementation_Video.mp4)
+![Demo Video](Implementation_Video.MP4)
 ---
 
 ## 🧩 Notes
