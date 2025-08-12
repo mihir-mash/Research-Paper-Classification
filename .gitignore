@@ -33,6 +33,7 @@ temp.*
 drive dataset/
 parsed_texts/
 cleaned_texts/
+scibert_predictions.csv
 
 # PDF and other large documents
 *.pdf
